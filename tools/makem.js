@@ -107,6 +107,7 @@ var FLAGS = '' + OPTIMIZE_FLAGS;
 FLAGS += ' -s TOTAL_MEMORY=' + MEM + ' ';
 FLAGS += ' -s NO_BROWSER=1 '; // for 20k less
 FLAGS += ' --memory-init-file 0 '; // for memless file
+FLAGS += ' -s WASM=1 '; // enable webassembly
 
 var PRE_FLAGS = ' --pre-js ' + path.resolve(__dirname, '../js/artoolkit.api.js') +' ';
 
