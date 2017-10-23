@@ -195,7 +195,9 @@
 		}
 
 		var nftMarkerCount = this.nftMarkerCount;
-		artoolkit.detectNFTMarker(this.id);
+          // TODO
+          //artoolkit.detectNFTMarker(this.id);
+		this.detectMarker(image);
 		for (var i=0; i<nftMarkerCount; i++) {
 			var markerInfo = this.getNFTMarker(i);
 
@@ -584,6 +586,13 @@
 	ARController.prototype.detectMarker = function(image) {
 		if (this._copyImageToHeap(image)) {
 			return artoolkit.detectMarker(this.id);
+		}
+		return -99;
+	};
+
+	ARController.prototype.detectNFTMarker = function(image) {
+		if (this._copyImageToHeap(image)) {
+			return artoolkit.detectNFTMarker(this.id);
 		}
 		return -99;
 	};
