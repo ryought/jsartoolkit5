@@ -192,13 +192,14 @@ extern "C" {
 	}
 
 	int detectNFTMarker(int id) {
-                ARLOGe("in detectNFTMarker\n");
 		if (arControllers.find(id) == arControllers.end()) { return -1; }
 		arController *arc = &(arControllers[id]);
 
 		KpmResult *kpmResult = NULL;
 		int kpmResultNum = -1;
 
+
+                // TODO ここで止まる integer result unrepresentable
           kpmMatching( arc->kpmHandle, arc->videoFrame );
           kpmGetResult( arc->kpmHandle, &kpmResult, &kpmResultNum );
           return kpmResultNum;
@@ -846,7 +847,6 @@ extern "C" {
 
 	int detectMarker(int id) {
           // compare to detectNFTmarker
-                ARLOGe("**** in detectMarker\n");
 		if (arControllers.find(id) == arControllers.end()) { return ARCONTROLLER_NOT_FOUND; }
 		arController *arc = &(arControllers[id]);
 

@@ -195,9 +195,11 @@
 		}
 
 		var nftMarkerCount = this.nftMarkerCount;
-          // TODO
-          //artoolkit.detectNFTMarker(this.id);
-		this.detectMarker(image);
+
+                // TODO
+                artoolkit.detectNFTMarker(this.id);
+          //this.detectNFTMarker(image);
+
 		for (var i=0; i<nftMarkerCount; i++) {
 			var markerInfo = this.getNFTMarker(i);
 

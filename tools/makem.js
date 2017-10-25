@@ -103,11 +103,18 @@ if (HAVE_NFT) {
 
 var DEFINES = ' ';
 
-var FLAGS = '' + OPTIMIZE_FLAGS;
+// var FLAGS = '' + OPTIMIZE_FLAGS;
+var FLAGS = ' -g4 ';
 FLAGS += ' -s TOTAL_MEMORY=' + MEM + ' ';
 FLAGS += ' -s NO_BROWSER=1 '; // for 20k less
 FLAGS += ' --memory-init-file 0 '; // for memless file
 FLAGS += ' -s WASM=1 '; // enable webassembly
+
+var MYFLAGS = ' -g4 -s "BINARYEN_TRAP_MODE=\'clamp\'" ';
+MYFLAGS += ' -s TOTAL_MEMORY=' + MEM + ' ';
+MYFLAGS += ' -s NO_BROWSER=1 '; // for 20k less
+MYFLAGS += ' --memory-init-file 0 '; // for memless file
+MYFLAGS += ' -s WASM=1 '; // enable webassembly
 
 var PRE_FLAGS = ' --pre-js ' + path.resolve(__dirname, '../js/artoolkit.api.js') +' ';
 
@@ -199,6 +206,11 @@ var compile_combine_min = format(EMCC + ' ' + INCLUDES + ' '
 	+ ' {OUTPUT_PATH}*.bc ' + MAIN_SOURCES
 	+ FLAGS + ' ' + DEFINES + PRE_FLAGS + ' -o {OUTPUT_PATH}{BUILD_FILE} ',
 	OUTPUT_PATH, OUTPUT_PATH, BUILD_MIN_FILE);
+// for debug ( -g4 and disable optimization )
+// var compile_combine_min = format(EMCC + ' ' + INCLUDES + ' '
+// 	+ ' {OUTPUT_PATH}*.bc ' + MAIN_SOURCES
+// 	+ MYFLAGS + ' ' + DEFINES + PRE_FLAGS + ' -o {OUTPUT_PATH}{BUILD_FILE} ',
+// 	OUTPUT_PATH, OUTPUT_PATH, BUILD_MIN_FILE);
 
 var compile_all = format(EMCC + ' ' + INCLUDES + ' '
 	+ ar_sources.join(' ')

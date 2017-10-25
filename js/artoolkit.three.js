@@ -80,6 +80,7 @@
 			@param video Video image to use as scene background. Defaults to this.image
 		*/
 		ARController.prototype.createThreeScene = function(video) {
+                  console.log('hoge');
 			video = video || this.image;
 
 			this.setupThree();
