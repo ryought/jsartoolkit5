@@ -103,8 +103,8 @@ if (HAVE_NFT) {
 
 var DEFINES = ' ';
 
-var FLAGS = '' + OPTIMIZE_FLAGS;
-//var FLAGS = ' -g4 ';   // use in debug
+// var FLAGS = '' + OPTIMIZE_FLAGS;
+var FLAGS = ' -g4 ';   // use in debug
 FLAGS += ' -s TOTAL_MEMORY=' + MEM + ' ';
 FLAGS += ' -s NO_BROWSER=1 '; // for 20k less
 FLAGS += ' --memory-init-file 0 '; // for memless file
