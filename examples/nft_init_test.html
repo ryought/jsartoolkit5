@@ -6,7 +6,7 @@
 <script src="../build/artoolkit.min.js"></script>
 <script src="../js/artoolkit.api.js"></script>
 
-<video id="video" src="Data/IMG_3144.mov" width="640" height="360" loop="" controls="" autoplay></video>
+<video id="video" src="Data/IMG_3145.mov" width="640" height="360" loop="" controls="" autoplay></video>
 <!-- <img id="v" src="Data/IMG_3141.JPG"></img> -->
 
 <script>
@@ -18,15 +18,16 @@ ar.onload = function() {
 
 	// Load pattern marker.
 	//
-	ar.loadMarker('Data/patt.hiro', function(marker) {
-		markerId = marker;
-	});
+	//ar.loadMarker('Data/patt.hiro', function(marker) {
+	//	markerId = marker;
+	//});
 
-        //ar.loadNFTMarker('DataNFT/pinball', function(marker) {
-        //  markerId = marker;
-        //});
+        ar.loadNFTMarker('DataNFT/pinball', function(marker) {
+          markerId = marker;
+        });
 
-	ar.addEventListener('getMarker', function(ev) {
+	ar.addEventListener('getNFTMarker', function(ev) {
+          console.log('yaaa');
 		if (ev.data.marker.idPatt === markerId) {
 			console.log('saw marker', ev.data.marker);
 			console.log('transformation matrix', ar.getTransformationMatrix());
