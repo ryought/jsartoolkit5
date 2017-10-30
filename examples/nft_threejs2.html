@@ -30,10 +30,11 @@ html,body {
 <script async src="../build/artoolkit.min.js"></script>
 <script async src="js/third_party/three.js/three.min.js"></script>
 <script async src="../js/artoolkit.three.js"></script>
-
-<video id="v" src="Data/output_4.ogg" width="320" height="240" loop="" controls="" autoplay></video>
+<script async src="js/third_party/stats.min.js"></script>
 
 <script>
+
+var stats;
 
 window.ARThreeOnLoad = function() {
 
@@ -58,6 +59,15 @@ window.ARThreeOnLoad = function() {
 		}
 
 		document.body.insertBefore(renderer.domElement, document.body.firstChild);
+
+
+        // set stats
+        // 左上に表示するようCSSを記述してbody直下に表示
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        stats.domElement.style.zIndex = 100;
+        document.body.appendChild(stats.domElement);
 
 		var rotationV = 0;
 		var rotationTarget = 0;
@@ -91,6 +101,11 @@ window.ARThreeOnLoad = function() {
 			arScene.scene.add(markerRoot);
 		});
 
+		arController.loadMarker('Data/patt.kanji', function(markerId) {
+			var markerRoot = arController.createThreeMarker(markerId);
+			markerRoot.add(torus);
+			arScene.scene.add(markerRoot);
+		});
 
 		var tick = function() {
 			arScene.process();
@@ -102,6 +117,8 @@ window.ARThreeOnLoad = function() {
 
 			arScene.renderOn(renderer);
 			requestAnimationFrame(tick);
+
+                        stats.update();
 		};
 
 		tick();

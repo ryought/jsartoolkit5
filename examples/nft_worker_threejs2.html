@@ -23,22 +23,42 @@ html,body {
 
 <h1>NFT marker example with Three.js</h1>
 <p>On Chrome on Android, tap the screen to start playing video stream.</p>
+hoge 
 <p>Show  <a href="https://github.com/artoolkit/artoolkit5/blob/master/doc/Marker%20images/pinball.jpg">Pinball image</a> to camera to display a colorful object on top of it. Tap the screen to rotate the object.
 
 <p>&larr; <a href="index.html">Back to examples</a></p>
 
+<script src="../build/artoolkit.debug.js"></script>
 <script async src="../build/artoolkit.min.js"></script>
 <script async src="js/third_party/three.js/three.min.js"></script>
 <script async src="../js/artoolkit.three.js"></script>
+<script async src="js/third_party/stats.min.js"></script>
 
-<video id="v" src="Data/output_4.ogg" width="320" height="240" loop="" controls="" autoplay></video>
+<script src="../js/artoolkit.proxy.js"></script>
 
 <script>
+var stats;
 
 window.ARThreeOnLoad = function() {
 
 	ARController.getUserMediaThreeScene({maxARVideoSize: 320, cameraParam: 'Data/camera_para-iPhone 5 rear 640x480 1.0m.dat', 
 	onSuccess: function(arScene, arController, arCamera) {
+
+		var proxy = new ARProxy(arController, '/examples/Data/camera_para-iPhone 5 rear 640x480 1.0m.dat', function() { console.log("got new", arguments); });
+
+		proxy.addEventListener('load', function(ev) {
+			console.log('ARController loaded', ev);
+
+			this.processingDone = false;
+			this.loadNFTMarker('/examples/DataNFT/pinball', function(ev) {
+				console.log('Created NFT marker', ev.result[0]);
+
+				var markerRoot = this.arController.createThreeNFTMarker(ev.result[0]);
+				markerRoot.add(sphere);
+				arScene.scene.add(markerRoot);
+				this.processingDone = true;
+			});
+		});
 
 		document.body.className = arController.orientation;
 
@@ -58,6 +78,13 @@ window.ARThreeOnLoad = function() {
 		}
 
 		document.body.insertBefore(renderer.domElement, document.body.firstChild);
+        // set stats
+        // 左上に表示するようCSSを記述してbody直下に表示
+        stats = new Stats();
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.top = '0px';
+        stats.domElement.style.zIndex = 100;
+        document.body.appendChild(stats.domElement);
 
 		var rotationV = 0;
 		var rotationTarget = 0;
@@ -85,15 +112,10 @@ window.ARThreeOnLoad = function() {
 		torus.position.z = 0.5;
 		torus.rotation.x = Math.PI/2;
 
-		arController.loadNFTMarker('DataNFT/pinball', function(markerId) {
-			var markerRoot = arController.createThreeNFTMarker(markerId);
-			markerRoot.add(sphere);
-			arScene.scene.add(markerRoot);
-		});
-
+		arController.process = function(image) {};
 
 		var tick = function() {
-			arScene.process();
+			proxy.process(arScene.video);
 
 			rotationV += (rotationTarget - sphere.rotation.z) * 0.05;
 			sphere.rotation.z += rotationV;
@@ -102,6 +124,7 @@ window.ARThreeOnLoad = function() {
 
 			arScene.renderOn(renderer);
 			requestAnimationFrame(tick);
+                        stats.update();
 		};
 
 		tick();
