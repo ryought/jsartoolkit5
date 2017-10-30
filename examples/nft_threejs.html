@@ -32,7 +32,6 @@ html,body {
 <script async src="../js/artoolkit.three.js"></script>
 <!-- <script async src="../js/artoolkit.api.js"></script> -->
 
-<video id="v" src="Data/output_4.ogg" width="320" height="240" loop="" controls="" autoplay></video>
 
 <script>
 
@@ -85,8 +84,9 @@ window.ARThreeOnLoad = function() {
 		torus.material.shading = THREE.FlatShading;
 		torus.position.z = 0.5;
 		torus.rotation.x = Math.PI/2;
-
-		arController.loadNFTMarker('DataNFT/pinball', function(markerId) {
+                
+                // choose pattern from 'Pattern/1' ~ 9
+		arController.loadNFTMarker('Pattern/3', function(markerId) {
 			var markerRoot = arController.createThreeNFTMarker(markerId);
 			markerRoot.add(sphere);
 			arScene.scene.add(markerRoot);

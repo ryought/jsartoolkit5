@@ -5,33 +5,40 @@
 <!-- <script src="../build/artoolkit.debug.js"></script> -->
 <script src="../build/artoolkit.min.js"></script>
 <script src="../js/artoolkit.api.js"></script>
-
-<video id="video" src="Data/IMG_3145.mov" width="640" height="360" loop="" controls="" autoplay></video>
+<p id="count"></p>
+<input type="file" id="videoFile" />
+<video id="video" src="Data/IMG_3146.mov" width="640" height="360" controls="" autoplay></video>
 <!-- <img id="v" src="Data/IMG_3141.JPG"></img> -->
 
 <script>
 var video = document.querySelector('#video');
+var count = document.querySelector('#count');
 //var ar = new ARController(video.videoWidth, video.videoHeight, 'Data/camera_para.dat');
-var ar = new ARController(640, 360, 'Data/camera_para.dat');
+console.log(video.width)
+var ar = new ARController(video.width, video.height, 'Data/camera_para.dat');
 ar.onload = function() {
 	var markerId;
+        var number = 0;
+        count.textContent = number;
 
 	// Load pattern marker.
 	//
 	//ar.loadMarker('Data/patt.hiro', function(marker) {
 	//	markerId = marker;
 	//});
-
-        ar.loadNFTMarker('DataNFT/pinball', function(marker) {
+        ar.loadNFTMarker('Pattern/3', function(marker) {
           markerId = marker;
+          console.log('loaded');
+          console.log('markerID', marker);
         });
 
+
 	ar.addEventListener('getNFTMarker', function(ev) {
-          console.log('yaaa');
-		if (ev.data.marker.idPatt === markerId) {
-			console.log('saw marker', ev.data.marker);
-			console.log('transformation matrix', ar.getTransformationMatrix());
+          console.log('saw', ev.data.marker.id);
+		if (ev.data.marker.id === markerId) {
+                    number++;
 		}
+          count.textContent = number;
 	});
 
 	//console.log('camera matrix', ar.getCameraMatrix());
