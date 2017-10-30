@@ -1,25 +1,41 @@
 <html>
 <body>
 
-<script src="js/third_party/three.js/three.min.js"></script>
-<script src="../build/artoolkit.debug.js"></script>
+<!-- <script src="js/third_party/three.js/three.min.js"></script> -->
+<!-- <script src="../build/artoolkit.debug.js"></script> -->
+<script src="../build/artoolkit.min.js"></script>
 <script src="../js/artoolkit.api.js"></script>
+
+<!-- <video id="v2" src="Data/IMG_3140.mov" width="640" height="320" loop="" controls="" autoplay></video> -->
+<img id="v" src="Data/IMG_3141.JPG"></img>
 
 <script>
 
+
+
 var cameraParam = new ARCameraParam();
 cameraParam.onload = function() {
+        var video = document.getElementById('v'); 
 
-	arController = new ARController(320, 240, cameraParam);
-	arController._initNFT();
-	arController.debugSetup();
+	arController = new ARController(640, 320, cameraParam);
+        arController._initialize();
+	//arController._initNFT();
+	//arController.debugSetup();
+
 
 	arController.loadNFTMarker('DataNFT/pinball', function(markerId) { 
 		console.log('Created NFT marker', arguments);
 	});
 
+
+        var interval = setInterval(function() {
+          arController.process(video);
+        }, 30);
+
 };
-cameraParam.load('Data/camera_para.dat');
+setInterval(function() {
+cameraParam.load('Data/camera_para-iPhone 5 rear 640x480 1.0m.dat');
+}, 1000);
 
 
 </script>

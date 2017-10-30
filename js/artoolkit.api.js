@@ -198,9 +198,9 @@
 		artoolkit.detectNFTMarker(this.id);
 		for (var i=0; i<nftMarkerCount; i++) {
 			var markerInfo = this.getNFTMarker(i);
-                          console.log('found');
 
 			if (markerInfo.found) {
+                          console.log('found');
 				var visible = this.trackNFTMarkerId(i);
 				visible.matrix.set(markerInfo.pose);
 				visible.inCurrent = true;
