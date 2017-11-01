@@ -21,17 +21,25 @@ ar.onload = function() {
         var number = 0;
         count.textContent = number;
 
-        ar.loadNFTMarker('Pattern/3', function(marker) {
-          result[marker] = 0;
-          console.log('loaded');
-          console.log('markerID', marker);
-        });
-        ar.loadNFTMarker('Pattern/4', function(marker) {
-          result[marker] = 0;
-          console.log('loaded');
-          console.log('markerID', marker);
-        });
+          ar.loadNFTMarker('Pattern/3', function(marker) {
+            result[marker] = 0;
+            console.log('loaded');
+            console.log('markerID', marker);
+          });
 
+          ar.loadNFTMarker('Pattern/4', function(marker) {
+            result[marker] = 0;
+            console.log('loaded');
+            console.log('markerID', marker);
+          });
+//		ar.loadMarker('Data/patt.kanji', function(markerId) {
+//                  console.log('loaded');
+//                });
+//
+//		ar.loadMarker('Data/patt.hiro', function(markerId) {
+//                  console.log('loaedd');
+//                });
+//
 
 	ar.addEventListener('getNFTMarker', function(ev) {
           result[ev.data.marker.id]++;

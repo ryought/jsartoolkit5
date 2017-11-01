@@ -1670,8 +1670,9 @@
 	}
 
 	function writeByteArrayToFS(target, byteArray, callback) {
+          // TODO where is it definition
 		FS.writeFile(target, byteArray, { encoding: 'binary' });
-		// console.log('FS written', target);
+                console.log('FS written', target);
 
 		callback(byteArray);
 	}
