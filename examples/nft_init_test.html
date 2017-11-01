@@ -15,44 +15,48 @@ var video = document.querySelector('#video');
 var count = document.querySelector('#count');
 var result = {};
 //var ar = new ARController(video.videoWidth, video.videoHeight, 'Data/camera_para.dat');
-console.log(video.width)
-var ar = new ARController(video.width, video.height, 'Data/camera_para.dat');
-ar.onload = function() {
-        var number = 0;
-        count.textContent = number;
 
-          ar.loadNFTMarker('Pattern/3', function(marker) {
-            result[marker] = 0;
-            console.log('loaded');
-            console.log('markerID', marker);
+function run_test(marker) {
+  var ar = new ARController(video.width, video.height, 'Data/camera_para.dat');
+  ar.onload = function() {
+          var number = 0;
+          count.textContent = number;
+
+            ar.loadNFTMarker(marker, function(marker) {
+              result[marker] = 0;
+              console.log('loaded');
+              console.log('markerID', marker);
+            });
+
+          ar.addEventListener('getNFTMarker', function(ev) {
+            result[ev.data.marker.id]++;
+            console.log('[saw]', ev.data.marker.id, 'result: ', result);
           });
 
-          ar.loadNFTMarker('Pattern/4', function(marker) {
-            result[marker] = 0;
-            console.log('loaded');
-            console.log('markerID', marker);
-          });
-//		ar.loadMarker('Data/patt.kanji', function(markerId) {
-//                  console.log('loaded');
-//                });
-//
-//		ar.loadMarker('Data/patt.hiro', function(markerId) {
-//                  console.log('loaedd');
-//                });
-//
+          setInterval(function() {
+                  ar.process(video);
+          }, 33);
+  };
+  return ar;
+}
 
-	ar.addEventListener('getNFTMarker', function(ev) {
-          result[ev.data.marker.id]++;
-          console.log('[saw]', ev.data.marker.id, 'result: ', result);
-	});
+var A = ['Pattern/1', 'Pattern/2',  'Pattern/3',  'Pattern/4',  'Pattern/5',  'Pattern/6',  'Pattern/7', 'Pattern/8'];
 
-	//console.log('camera matrix', ar.getCameraMatrix());
+var ar = run_test(A.shift());
 
-	setInterval(function() {
-		ar.process(video);
-	}, 33);
-};
-
+video.addEventListener('ended', function() {
+  console.log('finished');
+  //ar.dispose();
+  pat = A.shift();
+  console.log(pat);
+  if(pat) {
+    console.log('continue next test');
+    ar = run_test(pat);
+    video.play();
+  }else{
+    console.log('finished');
+  }
+});
 
 </script>
 
