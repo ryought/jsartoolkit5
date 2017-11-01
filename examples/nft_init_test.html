@@ -13,32 +13,29 @@
 <script>
 var video = document.querySelector('#video');
 var count = document.querySelector('#count');
+var result = {};
 //var ar = new ARController(video.videoWidth, video.videoHeight, 'Data/camera_para.dat');
 console.log(video.width)
 var ar = new ARController(video.width, video.height, 'Data/camera_para.dat');
 ar.onload = function() {
-	var markerId;
         var number = 0;
         count.textContent = number;
 
-	// Load pattern marker.
-	//
-	//ar.loadMarker('Data/patt.hiro', function(marker) {
-	//	markerId = marker;
-	//});
         ar.loadNFTMarker('Pattern/3', function(marker) {
-          markerId = marker;
+          result[marker] = 0;
+          console.log('loaded');
+          console.log('markerID', marker);
+        });
+        ar.loadNFTMarker('Pattern/4', function(marker) {
+          result[marker] = 0;
           console.log('loaded');
           console.log('markerID', marker);
         });
 
 
 	ar.addEventListener('getNFTMarker', function(ev) {
-          console.log('saw', ev.data.marker.id);
-		if (ev.data.marker.id === markerId) {
-                    number++;
-		}
-          count.textContent = number;
+          result[ev.data.marker.id]++;
+          console.log('[saw]', ev.data.marker.id, 'result: ', result);
 	});
 
 	//console.log('camera matrix', ar.getCameraMatrix());
