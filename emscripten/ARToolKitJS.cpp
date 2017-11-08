@@ -232,11 +232,19 @@ extern "C" {
 	int loadNFTMarker(arController *arc, int surfaceSetCount, const char* datasetPathname) {
 		int i, pageNo;
 		AR2SurfaceSetT *surfaceSet;
-		KpmRefDataSet *refDataSet;
+		KpmRefDataSet *refDataSet, *refDataSet3;
 
 		KpmHandle *kpmHandle = arc->kpmHandle;
+		//ARLOGi("hogehoge%d\n", kpmHandle->xsize);
 
+		kpmGetRefDataSet(kpmHandle, &refDataSet3); //TODO
 		refDataSet = NULL;
+
+
+		if (refDataSet3->pageNum > 0){
+			// merging existing dataset
+			kpmMergeRefDataSet(&refDataSet, &refDataSet3);
+		}
 
 		// Load KPM data.
 		KpmRefDataSet  *refDataSet2;
@@ -247,16 +255,21 @@ extern "C" {
 			return (FALSE);
 		}
 		pageNo = surfaceSetCount;
+
+
 		ARLOGi("  Assigned page no. %d.\n", surfaceSetCount);
+
 		if (kpmChangePageNoOfRefDataSet(refDataSet2, KpmChangePageNoAllPages, surfaceSetCount) < 0) {
 		    ARLOGe("Error: kpmChangePageNoOfRefDataSet\n");
 		    return (FALSE);
 		}
+		ARLOGi("changed to %d.\n", refDataSet2->refPoint[0].pageNo);
 		if (kpmMergeRefDataSet(&refDataSet, &refDataSet2) < 0) {
 		    ARLOGe("Error: kpmMergeRefDataSet\n");
 		    return (FALSE);
 		}
-		ARLOGi("  Done.\n");
+
+		ARLOGi("  Merge Done.\n");
 
 		// Load AR2 data.
 		ARLOGi("Reading %s.fset\n", datasetPathname);
@@ -272,7 +285,10 @@ extern "C" {
 		    ARLOGe("Error: kpmSetRefDataSet\n");
 		    return (FALSE);
 		}
+
+		// TODO instead of freeing in the end of Merge
 		kpmDeleteRefDataSet(&refDataSet);
+		kpmDeleteRefDataSet(&refDataSet2);
 
 		ARLOGi("Loading of NFT data complete.\n");
 		return (TRUE);
@@ -780,7 +796,7 @@ extern "C" {
 		ARMarkerInfo* marker = markerIndex < 0 ? &gMarkerInfo : &((arc->arhandle)->markerInfo[markerIndex]);
 
 		marker->dir = dir;
-		
+
 		return 0;
 	}
 

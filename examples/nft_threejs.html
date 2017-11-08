@@ -86,12 +86,32 @@ window.ARThreeOnLoad = function() {
 		torus.rotation.x = Math.PI/2;
                 
                 // choose pattern from 'Pattern/1' ~ 9
-		arController.loadNFTMarker('Pattern/3', function(markerId) {
+
+		arController.loadNFTMarker('Pattern/1', function(markerId) {
+      console.log('marker added in id:', markerId);
+			var markerRoot = arController.createThreeNFTMarker(markerId);
+			markerRoot.add(sphere);
+			arScene.scene.add(markerRoot);
+		});
+		arController.loadNFTMarker('Pattern/2', function(markerId) {
+      console.log('marker added in id:', markerId);
 			var markerRoot = arController.createThreeNFTMarker(markerId);
 			markerRoot.add(sphere);
 			arScene.scene.add(markerRoot);
 		});
 
+		arController.loadNFTMarker('Pattern/3', function(markerId) {
+      console.log('marker added in id:', markerId);
+			var markerRoot = arController.createThreeNFTMarker(markerId);
+			markerRoot.add(sphere);
+			arScene.scene.add(markerRoot);
+		});
+		arController.loadNFTMarker('Pattern/4', function(markerId) {
+      console.log('marker added in id:', markerId);
+			var markerRoot = arController.createThreeNFTMarker(markerId);
+			markerRoot.add(sphere);
+			arScene.scene.add(markerRoot);
+		});
 
 		var tick = function() {
 			arScene.process();
