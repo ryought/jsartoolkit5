@@ -111,6 +111,10 @@ FLAGS += ' -s DISABLE_EXCEPTION_CATCHING=0 -g4 ';
 
 var PRE_FLAGS = ' --pre-js ' + path.resolve(__dirname, '../js/artoolkit.api.js') +' ';
 
+// packaging pattern files using emscripten
+// https://kripken.github.io/emscripten-site/docs/porting/files/packaging_files.html
+var PACKAGE_FLAGS = ' --preload-file ' + path.resolve(__dirname, '../examples/Pattern') + ' ';
+
 FLAGS += ' --bind ';
 
 /* DEBUG FLAGS */
@@ -197,7 +201,7 @@ var compile_combine = format(EMCC + ' ' + INCLUDES + ' '
 
 var compile_combine_min = format(EMCC + ' ' + INCLUDES + ' '
 	+ ' {OUTPUT_PATH}*.bc ' + MAIN_SOURCES
-	+ FLAGS + ' ' + DEFINES + PRE_FLAGS + ' -o {OUTPUT_PATH}{BUILD_FILE} ',
+	+ FLAGS + ' ' + PACKAGE_FLAGS + DEFINES + PRE_FLAGS + ' -o {OUTPUT_PATH}{BUILD_FILE} ',
 	OUTPUT_PATH, OUTPUT_PATH, BUILD_MIN_FILE);
 
 var compile_all = format(EMCC + ' ' + INCLUDES + ' '
