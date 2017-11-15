@@ -200,7 +200,6 @@
 			var markerInfo = this.getNFTMarker(i);
 
 			if (markerInfo.found) {
-                          console.log('found');
 				var visible = this.trackNFTMarkerId(i);
 				visible.matrix.set(markerInfo.pose);
 				visible.inCurrent = true;
