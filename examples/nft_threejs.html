@@ -27,17 +27,18 @@ html,body {
 
 <p>&larr; <a href="index.html">Back to examples</a></p>
 
-<script async src="../build/artoolkit.min.js"></script>
+<script src="../build/patterns.js"></script>
+<script src="../build/artoolkit.min.js"></script>
+<script src="../js/artoolkit.api.js"></script>
 <script async src="js/third_party/three.js/three.min.js"></script>
 <script async src="../js/artoolkit.three.js"></script>
-<!-- <script async src="../js/artoolkit.api.js"></script> -->
 
 
 <script>
 
 window.ARThreeOnLoad = function() {
 
-	ARController.getUserMediaThreeScene({maxARVideoSize: 320, cameraParam: 'Data/camera_para-iPhone 5 rear 640x480 1.0m.dat', 
+	ARController.getUserMediaThreeScene({maxARVideoSize: 320, cameraParam: 'Data/camera_para-iPhone 5 rear 640x480 1.0m.dat',
 	onSuccess: function(arScene, arController, arCamera) {
 
 		document.body.className = arController.orientation;
@@ -97,8 +98,8 @@ window.ARThreeOnLoad = function() {
 		sphere2.position.x = 80;
 		sphere2.position.y = 80;
 		sphere2.scale.set(80,80,80);
-                
 
+/*
 		arController.loadNFTMarker('Pattern/1', function(markerId) {
       console.log('marker added in id:', markerId);
 			var markerRoot = arController.createThreeNFTMarker(markerId);
@@ -111,6 +112,22 @@ window.ARThreeOnLoad = function() {
 			markerRoot2.add(torus);
 			arScene.scene.add(markerRoot2);
 		});
+		*/
+
+		arController.loadNFTMarkerPackage(['/Pattern/1','/Pattern/2', '/Pattern/3'], function(markerId) {
+			console.log('marker added in id:', markerId);
+			var markerRoot2 = arController.createThreeNFTMarker(markerId);
+			markerRoot2.add(torus);
+			arScene.scene.add(markerRoot2);
+		});
+
+
+    /*
+    arController.loadNFTMarkerPackage(function(markerIds){
+      for id in markerIds
+
+    });
+    */
 
     /*
 		arController.loadNFTMarker('Pattern/3', function(markerId) {

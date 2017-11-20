@@ -108,12 +108,15 @@ FLAGS += ' -s TOTAL_MEMORY=' + MEM + ' ';
 FLAGS += ' -s NO_BROWSER=1 '; // for 20k less
 FLAGS += ' --memory-init-file 0 '; // for memless file
 FLAGS += ' -s DISABLE_EXCEPTION_CATCHING=0 -g4 ';
+// FLAGS += ' -s EXPORT_NAME=\'"Module2"\' ';
 
 var PRE_FLAGS = ' --pre-js ' + path.resolve(__dirname, '../js/artoolkit.api.js') +' ';
 
 // packaging pattern files using emscripten
 // https://kripken.github.io/emscripten-site/docs/porting/files/packaging_files.html
-var PACKAGE_FLAGS = ' --preload-file ' + path.resolve(__dirname, '../examples/Pattern') + ' ';
+var PACKAGE_FLAGS = ' --preload-file ' + ' examples/Pattern/6.fset3 ';
+console.log('package flag', PACKAGE_FLAGS);
+// FLAGS += PACKAGE_FLAGS;
 
 FLAGS += ' --bind ';
 
@@ -200,8 +203,10 @@ var compile_combine = format(EMCC + ' ' + INCLUDES + ' '
 	OUTPUT_PATH, OUTPUT_PATH, BUILD_FILE);
 
 var compile_combine_min = format(EMCC + ' ' + INCLUDES + ' '
-	+ ' {OUTPUT_PATH}*.bc ' + MAIN_SOURCES
-	+ FLAGS + ' ' + PACKAGE_FLAGS + DEFINES + PRE_FLAGS + ' -o {OUTPUT_PATH}{BUILD_FILE} ',
+  + ' {OUTPUT_PATH}*.bc ' + MAIN_SOURCES
+	// + FLAGS + ' '  + DEFINES + PACKAGE_FLAGS +  PRE_FLAGS + ' -o {OUTPUT_PATH}{BUILD_FILE} ',
+	// + FLAGS + ' '  + DEFINES + PRE_FLAGS + ' -o {OUTPUT_PATH}{BUILD_FILE} ',
+	+ FLAGS + ' '  + DEFINES + ' -o {OUTPUT_PATH}{BUILD_FILE} ',
 	OUTPUT_PATH, OUTPUT_PATH, BUILD_MIN_FILE);
 
 var compile_all = format(EMCC + ' ' + INCLUDES + ' '
@@ -251,7 +256,7 @@ addJob(compile_arlib);
 // addJob(compile_kpm);
 // compile_kpm
 addJob(compile_libjpeg);
-addJob(compile_combine);
+// addJob(compile_combine);
 addJob(compile_combine_min);
 // addJob(compile_all);
 
