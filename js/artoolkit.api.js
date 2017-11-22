@@ -448,6 +448,7 @@
 		@param {function} onError - The error callback. Called with the encountered error if the load fails.
 	*/
 	ARController.prototype.loadNFTMarker = function(markerURL, onSuccess, onError) {
+		console.log('[loadNFTMarker] FS readdir /', FS.readdir('/'));
 		var self = this;
 		return artoolkit.addNFTMarker(this.id, markerURL, function(id) {
 			self.nftMarkerCount = id + 1;
@@ -456,11 +457,13 @@
 	};
 
   // load multiple nft marker at the same time.
-  // using gzip
-  ARController.prototype.loadNFTMarkerPackage = function(urlArray, onSuccess, onError) {
+  ARController.prototype.loadNFTMarkerPackage = function(packagefile, onSuccess, onError) {
+    console.log('[loadNFTMarkerPackage @ ARController] going to load');
+		console.log('[loadNFTMarkerPaclage] FS readdir /', FS.readdir('/'));
     var self = this;
-    return artoolkit.addNFTMarkerPackage(this.id, urlArray, function(id) {
+    return artoolkit.addNFTMarkerPackage(this.id, packagefile, function(id) {
 			self.nftMarkerCount = id + 1;
+			console.log('[loadNFTMARKER]************callback()', id);
       onSuccess(id);
     }, onError);
   };
@@ -1263,6 +1266,8 @@
 		mediaDevicesConstraints.facingMode = facing;
 
 		navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+		// TODO 背面カメラに変更するならここ
 		var hdConstraints = {
 			audio: false,
 			video: {
@@ -1554,24 +1559,21 @@
 	];
 
 	function runWhenLoaded() {
-    console.log('when loaded');
+    console.log('[runWhenLoaded]');
     console.log('inside of Module', Module);
-		// console.log('FS readdir /', FS.readdir('/'));
+		console.log('[runWhenLoaded] FS readdir /', FS.readdir('/'));
 
 		FUNCTIONS.forEach(function(n) {
 			artoolkit[n] = Module[n];
-      console.log('loaded to artoolkit', n, Module[n]);
 		})
 
 		for (var m in Module) {
 			if (m.match(/^AR/)) {
         artoolkit[m] = Module[m];
-        console.log('loaded to artoolkit 2', m);
       }
 		}
 	}
   console.log('artoolkit', artoolkit);
-  console.log('artoolkit setup', artoolkit.setup);
 
 	var marker_count = 0;
 	function addMarker(arId, url, callback) {
@@ -1582,18 +1584,40 @@
 		});
 	}
 
-  function addNFTMarkerPackage(arId, urlArray ,callback) {
+  function addNFTMarkerPackage(arId, packagefile ,callback) {
+		/*
+		packagefile = {filename: '/examples/Pattern/catted.data',
+										targets: ["1.fset", "1.fset3", "1.iset", "2.fset", "2.fset3", "2.iset"],
+										sizes  : [704, 101248, 9562, 6912, 507316, 49742]}
+		*/
     // load packages
-		console.log('FS readdir /', FS.readdir('/'));
-    console.log('FS readdir /Pattern/', FS.readdir('/Pattern/'));
-
+		console.log('[addNFTMarkerPackage] FS readdir /', FS.readdir('/'));
+    // console.log('FS readdir /Pattern/', FS.readdir('/Pattern/'));
+		/*
     urlArray.forEach(function(url) {
       var id = Module._addNFTMarker(arId, url);
       if (callback) callback(id);
     });
+		*/
+  // ajaxMultiFiles('~pattern.data', ['1.patt', '2.patt'], [1552, 12324], f)
+		var patternIds = filterPatternName(packagefile.targets);
+    ajaxMultiFiles(packagefile.filename, packagefile.targets, packagefile.sizes,
+			function() {
+				console.log('[packfile', packagefile);
+
+				console.log('[filter pattern name]', patternIds);
+				// 全部揃ったら，一回だけやる
+				patternIds.forEach(function(patternId) {
+					console.log('[register]', patternId);
+					var id = Module._addNFTMarker(arId, patternId);
+	      	if (callback) callback(id);
+				})
+    })
+
   }
 
 	function addNFTMarker(arId, url, callback) {
+		console.log('[addNFTMarker] FS readdir /', FS.readdir('/'));
 		var mId = marker_count++;
 		var prefix = '/markerNFT_' + mId;
 		var filename1 = prefix + '.fset';
@@ -1610,6 +1634,19 @@
 		});
 
 
+	}
+
+	function filterPatternName(targets) {
+		console.log('[hogehoge]', targets);
+		var f = function(elem, index, array) {
+			var type = elem.split('.');
+			return type[type.length - 1].toLowerCase() === 'fset3';
+		}
+		var onlyfset3 = targets.filter(f);
+
+		return onlyfset3.map(function(x) {
+			return x.slice(0,-6); // remove tailing '.fset3'
+		});
 	}
 
 	function bytesToString(array) {
@@ -1679,6 +1716,8 @@
 
 	var camera_count = 0;
 	function loadCamera(url, callback) {
+    console.log('[loadCamera]');
+		console.log('[loadCamera] dir /', FS.readdir('/'));
 		var filename = '/camera_param_' + camera_count++;
 		var writeCallback = function() {
 			var id = Module._loadCamera(filename);
@@ -1706,12 +1745,11 @@
 
 	function writeByteArrayToFS(target, byteArray, callback) {
     // TODO
-		console.log('FS readdir /', FS.readdir('/'));
+		//console.log('FS readdir /', FS.readdir('/'));
 		FS.writeFile(target, byteArray, { encoding: 'binary' });
     console.log('FS written', target);
-		console.log('FS readdir /', FS.readdir('/'));
+		//console.log('FS readdir /', FS.readdir('/'));
     // console.log('FS readdir /examples/', FS.readdir('/examples/'));
-
 		callback(byteArray);
 	}
 
@@ -1728,12 +1766,46 @@
 			// console.log('ajax done for ', url);
 			var arrayBuffer = oReq.response;
 			var byteArray = new Uint8Array(arrayBuffer);
+      console.log(arrayBuffer);
 			writeByteArrayToFS(target, byteArray, callback);
 		};
 
 		oReq.send();
 	}
 
+  // ajaxMultiFiles('~pattern.data', ['1.patt', '2.patt'], [1552, 12324], f)
+	//   url: location of packaged file
+	//   targets: filenames
+	//   sizes: sizes of files
+	// download package and split and register into filesystem
+  function ajaxMultiFiles(url, targets, sizes, callback) {
+		var oReq = new XMLHttpRequest();
+		oReq.open('GET', url, true);
+		oReq.responseType = 'arraybuffer'; // blob arraybuffer
+
+		oReq.onload = function(oEvent) {
+			// console.log('ajax done for ', url);
+			var arrayBuffer = oReq.response;
+			splitAndWriteArrayBufferToFS(arrayBuffer, targets, sizes, 0, callback);
+		};
+		oReq.send();
+  }
+
+	function splitAndWriteArrayBufferToFS(arrayBuffer, targets, sizes, begin, callback) {
+		if(targets.length === 0) {
+			callback();
+		} else {
+			var target = targets.shift();
+			var size = sizes.shift();
+
+			var slicedBuffer = arrayBuffer.slice(begin, begin+size);
+			var splittedByteArray = new Uint8Array(slicedBuffer);
+
+			writeByteArrayToFS(target, splittedByteArray, function(array){
+				splitAndWriteArrayBufferToFS(arrayBuffer, targets, sizes, begin+size, callback);
+			});
+		}
+	}
 	function ajaxDependencies(files, callback) {
 		var next = files.pop();
 		if (next) {

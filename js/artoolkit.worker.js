@@ -2,6 +2,8 @@
 	ARToolKit Web Worker proxy.
 */
 
+
+importScripts("./artoolkit.api.js");
 importScripts("../build/artoolkit.min.js");
 
 WorkerARControllers = {};
@@ -9,6 +11,7 @@ WorkerARControllerID = 0;
 
 callbackMethods = {
 	'loadNFTMarker': 1,
+	'loadNFTMarkerPackage': 1,
 	'loadMarker': 1,
 	'loadMultiMarker': 1
 };
@@ -16,7 +19,8 @@ callbackMethods = {
 onmessage = function(ev) {
 
 	if (ev.data.method === 'new') {
-
+    console.log('[worker] creating new arcontroller');
+    // TODO 多分ここで，別のjsでロードしたpatternが引き継がれてない
 		var arController = new ARController(ev.data.arguments[0], ev.data.arguments[1], ev.data.arguments[2]);
 		var id = WorkerARControllerID++;
 		WorkerARControllers[id] = arController;

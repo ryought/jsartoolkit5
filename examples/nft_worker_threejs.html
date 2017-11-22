@@ -27,9 +27,10 @@ html,body {
 
 <p>&larr; <a href="index.html">Back to examples</a></p>
 
-<script async src="../build/artoolkit.min.js"></script>
-<script async src="js/third_party/three.js/three.min.js"></script>
-<script async src="../js/artoolkit.three.js"></script>
+<script src="../build/artoolkit.min.js"></script>
+<script src="../js/artoolkit.api.js"></script>
+<script src="js/third_party/three.js/three.min.js"></script>
+<script src="../js/artoolkit.three.js"></script>
 
 <script src="../js/artoolkit.proxy.js"></script>
 
@@ -37,7 +38,7 @@ html,body {
 
 window.ARThreeOnLoad = function() {
 
-	ARController.getUserMediaThreeScene({maxARVideoSize: 320, cameraParam: 'Data/camera_para-iPhone 5 rear 640x480 1.0m.dat', 
+	ARController.getUserMediaThreeScene({maxARVideoSize: 320, cameraParam: 'Data/camera_para-iPhone 5 rear 640x480 1.0m.dat',
 	onSuccess: function(arScene, arController, arCamera) {
 
 		var proxy = new ARProxy(arController, '/examples/Data/camera_para-iPhone 5 rear 640x480 1.0m.dat', function() { console.log("got new", arguments); });
@@ -46,6 +47,8 @@ window.ARThreeOnLoad = function() {
 			console.log('ARController loaded', ev);
 
 			this.processingDone = false;
+      /* default source using loadNFTMarker with single pattern file */
+      /*
 			this.loadNFTMarker('/examples/DataNFT/pinball', function(ev) {
 				console.log('Created NFT marker', ev.result[0]);
 
@@ -54,6 +57,31 @@ window.ARThreeOnLoad = function() {
 				arScene.scene.add(markerRoot);
 				this.processingDone = true;
 			});
+      */
+      // TODO loadNFTMarkerPackage() from proxy
+
+			var packagefile = {filename: '/examples/Pattern/catted.data',
+												  targets: ["1.fset", "1.fset3", "1.iset", "2.fset", "2.fset3", "2.iset"],
+												    sizes: [704, 101248, 9562, 6912, 507316, 49742]};
+			console.log('[html] going to loadNFTMarker');
+      this.loadNFTMarkerPackage(packagefile , function(ev) {
+        console.log('[html] marker added in id:', ev, ev.result[0]);
+        var markerRoot = this.arController.createThreeNFTMarker(ev.result[0]);
+
+				var sphere = new THREE.Mesh(
+					new THREE.SphereGeometry(0.5, 8, 8),
+					new THREE.MeshNormalMaterial()
+				);
+				sphere.material.shading = THREE.FlatShading;
+				sphere.position.z = 40;
+				sphere.position.x = 80;
+				sphere.position.y = 80;
+				sphere.scale.set(80,80,80);
+
+        markerRoot.add(sphere);
+        arScene.scene.add(markerRoot);
+				this.processingDone = true;
+      });
 		});
 
 		document.body.className = arController.orientation;
