@@ -38,9 +38,9 @@ html,body {
 
 window.ARThreeOnLoad = function() {
 
-	ARController.getUserMediaThreeScene({maxARVideoSize: 320, cameraParam: 'Data/camera_para-iPhone 5 rear 640x480 1.0m.dat',
+	ARController.getUserMediaThreeScene({facingMode:'environment', maxARVideoSize: 320, cameraParam: 'Data/camera_para-iPhone 5 rear 640x480 1.0m.dat',
 	onSuccess: function(arScene, arController, arCamera) {
-
+		console.log("called withenvironment");
 		var proxy = new ARProxy(arController, '/examples/Data/camera_para-iPhone 5 rear 640x480 1.0m.dat', function() { console.log("got new", arguments); });
 
 		proxy.addEventListener('load', function(ev) {

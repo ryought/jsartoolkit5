@@ -1194,6 +1194,7 @@
 	*/
 	ARController.getUserMedia = function(configuration) {
 		var facing = configuration.facingMode || 'environment';
+		console.log('facing:', facing); // TODO
 
 		var onSuccess = configuration.onSuccess;
 		var onError = configuration.onError || function(err) { console.error("ARController.getUserMedia", err); };
@@ -1275,9 +1276,10 @@
 		  	}
 		};
 
-		if ( false ) {
+		if ( true ) {
 		// if ( navigator.mediaDevices || window.MediaStreamTrack) {
 			if (navigator.mediaDevices) {
+				console.log("navigator.mediaDevices.getUsermedia with", mediaDevicesConstraints);
 				navigator.mediaDevices.getUserMedia({
 					audio: false,
 					video: mediaDevicesConstraints
@@ -1288,6 +1290,7 @@
 					if (facing && facing.exact) {
 						facingDir = facing.exact;
 					}
+					console.log("not navigator.mediaDevices", sources);
 					for (var i=0; i<sources.length; i++) {
 						if (sources[i].kind === 'video' && sources[i].facing === facingDir) {
 							hdConstraints.video.mandatory.sourceId = sources[i].id;
