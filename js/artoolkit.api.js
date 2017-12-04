@@ -458,13 +458,21 @@
 
   // load multiple nft marker at the same time.
   ARController.prototype.loadNFTMarkerPackage = function(packagefile, onSuccess, onError) {
-    console.log('[loadNFTMarkerPackage @ ARController] going to load');
-		console.log('[loadNFTMarkerPaclage] FS readdir /', FS.readdir('/'));
     var self = this;
-    return artoolkit.addNFTMarkerPackage(this.id, packagefile, function(id) {
-			self.nftMarkerCount = id + 1;
-			console.log('[loadNFTMARKER]************callback()', id);
-      onSuccess(id);
+    console.log('loadNFTMarkerPackage', packagefile);
+    return artoolkit.addNFTMarkerPackage(this.id, packagefile, function(mode, id, ids) {
+      console.log('callback', mode, id, ids);
+      if (mode === 'each') {
+        console.log('in eachtime callback');
+        self.nftMarkerCount = id + 1;
+        console.log('[loadNFTMARKER]************callback()', id);
+        console.log('going to return', 'each', id, null);
+        console.log(onSuccess);
+        // onSuccess('each', id, null);
+      } else if (mode === 'final') {
+        console.log('final!!');
+        onSuccess('final', null, ids);
+      }
     }, onError);
   };
 
@@ -1103,8 +1111,10 @@
 			if (this.orientation === 'portrait') {
 				this.ctx.translate(this.canvas.width, 0);
 				this.ctx.rotate(Math.PI/2);
+        console.log('drawImage'); 
 				this.ctx.drawImage(image, 0, 0, this.canvas.height, this.canvas.width); // draw video
 			} else {
+        console.log('drawImage'); 
 				this.ctx.drawImage(image, 0, 0, this.canvas.width, this.canvas.height); // draw video
 			}
 
@@ -1230,7 +1240,8 @@
 		});
 
 		var success = function(stream) {
-      console.log(stream, typeof(stream))
+      console.log('*************** success');
+      console.log('*************** success', stream);
 			video.addEventListener('loadedmetadata', initProgress, false);
       // changed because of deprecation
 			// video.src = window.URL.createObjectURL(stream);
@@ -1286,7 +1297,6 @@
 		if ( true ) {
 		// if ( navigator.mediaDevices || window.MediaStreamTrack) {
 			if (navigator.mediaDevices) {
-				console.log("hahaha navigator.mediaDevices.getUsermedia with", mediaDevicesConstraints);
 				navigator.mediaDevices.getUserMedia({
 					audio: false,
 					video: mediaDevicesConstraints
@@ -1596,14 +1606,13 @@
 		});
 	}
 
-  function addNFTMarkerPackage(arId, packagefile ,callback) {
+  function addNFTMarkerPackage(arId, packagefile, callback, callbackError) {
 		/*
 		packagefile = {filename: '/examples/Pattern/catted.data',
 										targets: ["1.fset", "1.fset3", "1.iset", "2.fset", "2.fset3", "2.iset"],
 										sizes  : [704, 101248, 9562, 6912, 507316, 49742]}
 		*/
     // load packages
-		console.log('[addNFTMarkerPackage] FS readdir /', FS.readdir('/'));
     // console.log('FS readdir /Pattern/', FS.readdir('/Pattern/'));
 		/*
     urlArray.forEach(function(url) {
@@ -1613,18 +1622,23 @@
 		*/
   // ajaxMultiFiles('~pattern.data', ['1.patt', '2.patt'], [1552, 12324], f)
 		var patternIds = filterPatternName(packagefile.targets);
-    ajaxMultiFiles(packagefile.filename, packagefile.targets, packagefile.sizes,
+    var targets = packagefile.targets
+      , sizes = packagefile.sizes;
+    ajaxMultiFiles(packagefile.filename, targets, sizes,
 			function() {
-				console.log('[packfile', packagefile);
-
 				console.log('[filter pattern name]', patternIds);
+        var ids = [];
 				// 全部揃ったら，一回だけやる
 				patternIds.forEach(function(patternId) {
 					console.log('[register]', patternId);
 					var id = Module._addNFTMarker(arId, patternId);
-	      	if (callback) callback(id);
-				})
-    })
+          if (callback) callback('each', id, null);
+          ids.push(id);
+          console.log('in addnftmarkerpackage');
+				});
+        console.log('call final', ids);
+        if (callback) callback('final', null, ids);
+    });
 
   }
 
@@ -1758,6 +1772,7 @@
 	function writeByteArrayToFS(target, byteArray, callback) {
     // TODO
 		//console.log('FS readdir /', FS.readdir('/'));
+    console.log(writeByteArrayToFS, target);
 		FS.writeFile(target, byteArray, { encoding: 'binary' });
     console.log('FS written', target);
 		//console.log('FS readdir /', FS.readdir('/'));
@@ -1791,6 +1806,7 @@
 	//   sizes: sizes of files
 	// download package and split and register into filesystem
   function ajaxMultiFiles(url, targets, sizes, callback) {
+    console.log('ajaxMultiFiles', targets, sizes, url);
 		var oReq = new XMLHttpRequest();
 		oReq.open('GET', url, true);
 		oReq.responseType = 'arraybuffer'; // blob arraybuffer
@@ -1807,14 +1823,17 @@
 		if(targets.length === 0) {
 			callback();
 		} else {
-			var target = targets.shift();
-			var size = sizes.shift();
+			// var target = targets.shift();
+			// var size = sizes.shift();
+      var target = targets[0];
+      var size = sizes[0];
 
 			var slicedBuffer = arrayBuffer.slice(begin, begin+size);
 			var splittedByteArray = new Uint8Array(slicedBuffer);
 
 			writeByteArrayToFS(target, splittedByteArray, function(array){
-				splitAndWriteArrayBufferToFS(arrayBuffer, targets, sizes, begin+size, callback);
+        splitAndWriteArrayBufferToFS(arrayBuffer, targets.slice(1), sizes.slice(1), 
+          begin+size, callback);
 			});
 		}
 	}
