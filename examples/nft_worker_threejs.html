@@ -25,6 +25,8 @@ html,body {
 <p>On Chrome on Android, tap the screen to start playing video stream.</p>
 <p>Show  <a href="https://github.com/artoolkit/artoolkit5/blob/master/doc/Marker%20images/pinball.jpg">Pinball image</a> to camera to display a colorful object on top of it. Tap the screen to rotate the object.
 
+<div id="result">initializing</div>
+
 <p>&larr; <a href="index.html">Back to examples</a></p>
 
 <script src="../build/artoolkit.min.js"></script>
@@ -66,21 +68,31 @@ window.ARThreeOnLoad = function() {
 			console.log('[html] going to loadNFTMarker');
       this.loadNFTMarkerPackage(packagefile , function(ev) {
         console.log('[html] marker added in id:', ev, ev.result[0]);
-        var markerRoot = this.arController.createThreeNFTMarker(ev.result[0]);
+        //var markerRoot = this.arController.createThreeNFTMarker(ev.result[0]);
 
-				var sphere = new THREE.Mesh(
-					new THREE.SphereGeometry(0.5, 8, 8),
-					new THREE.MeshNormalMaterial()
-				);
-				sphere.material.shading = THREE.FlatShading;
-				sphere.position.z = 40;
-				sphere.position.x = 80;
-				sphere.position.y = 80;
-				sphere.scale.set(80,80,80);
+				//var sphere = new THREE.Mesh(
+				//	new THREE.SphereGeometry(0.5, 8, 8),
+				//	new THREE.MeshNormalMaterial()
+				//);
+				//sphere.material.shading = THREE.FlatShading;
+				//sphere.position.z = 40;
+				//sphere.position.x = 80;
+				//sphere.position.y = 80;
+				//sphere.scale.set(80,80,80);
 
-        markerRoot.add(sphere);
-        arScene.scene.add(markerRoot);
+        //markerRoot.add(sphere);
+        //arScene.scene.add(markerRoot);
 				this.processingDone = true;
+        // マーカーロード終了
+        document.getElementById('result').textContent = 'start!';
+      });
+      /* マーカーを見つけた時のevent処理
+      */
+      this.arController.addEventListener('getNFTMarker', function(ev) {
+        document.getElementById('result').textContent = 'found marker:'+ev.data.marker.id;
+        setTimeout(function() {
+          document.getElementById('result').textContent = 'searching';
+        }, 1000);
       });
 		});
 
@@ -100,8 +112,11 @@ window.ARThreeOnLoad = function() {
 				document.body.className += ' desktop';
 			}
 		}
-
+    // http://abrakatabura.hatenablog.com/entry/2017/09/23/092127
+    // enable inline play in ios 
+    renderer.domElement.setAttribute("playsinline", true);
 		document.body.insertBefore(renderer.domElement, document.body.firstChild);
+    //console.log('renderer domelement', renderer.domElement);
 
 		var rotationV = 0;
 		var rotationTarget = 0;

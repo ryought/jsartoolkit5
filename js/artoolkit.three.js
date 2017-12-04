@@ -298,7 +298,7 @@
 				var obj;
 
 				obj = this.threeNFTMarkers[ev.data.marker.id];
-        console.log('ev.data.marker.id', ev.data.marker.id);
+        console.log('[found marker] id: ', ev.data.marker.id);
 
 				if (obj) {
 					obj.matrix.elements.set(ev.data.matrix);

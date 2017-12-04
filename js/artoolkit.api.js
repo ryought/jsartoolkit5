@@ -1200,6 +1200,8 @@
 		var onError = configuration.onError || function(err) { console.error("ARController.getUserMedia", err); };
 
 		var video = document.createElement('video');
+    video.setAttribute("playsinline", true);
+    video.setAttribute("autoplay", true);
 
 		var initProgress = function() {
 			if (this.videoWidth !== 0) {
@@ -1228,10 +1230,15 @@
 		});
 
 		var success = function(stream) {
+      console.log(stream, typeof(stream))
 			video.addEventListener('loadedmetadata', initProgress, false);
-			video.src = window.URL.createObjectURL(stream);
+      // changed because of deprecation
+			// video.src = window.URL.createObjectURL(stream);
+      video.srcObject = stream;
+
 			readyToPlay = true;
-			play(); // Try playing without user input, should work on non-Android Chrome
+      play(); // Try playing without user input, should work on non-Android Chrome
+      // TODO ios can also raise error in this point
 		};
 
 		var constraints = {};
@@ -1279,11 +1286,13 @@
 		if ( true ) {
 		// if ( navigator.mediaDevices || window.MediaStreamTrack) {
 			if (navigator.mediaDevices) {
-				console.log("navigator.mediaDevices.getUsermedia with", mediaDevicesConstraints);
+				console.log("hahaha navigator.mediaDevices.getUsermedia with", mediaDevicesConstraints);
 				navigator.mediaDevices.getUserMedia({
 					audio: false,
 					video: mediaDevicesConstraints
 				}).then(success, onError);
+			} else if (navigator.getUserMedia) {
+				navigator.getUserMedia(hdConstraints, success, onError);
 			} else {
 				MediaStreamTrack.getSources(function(sources) {
 					var facingDir = mediaDevicesConstraints.facingMode;
