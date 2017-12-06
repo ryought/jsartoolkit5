@@ -111,28 +111,36 @@ function success(stream) {
 		var id = ev.target;
 		console.log('ARController loaded', ev);
 
-		worker.call(id, 'loadNFTMarker', ['/examples/DataNFT/pinball'], function(ev) {
-			console.log('Created NFT marker', ev);
+    var packagefile = {filename: '/examples/Pattern/catted.data',
+      targets: ["1.fset", "1.fset3", "1.iset", "2.fset", "2.fset3", "2.iset"],
+      sizes: [704, 101248, 9562, 6912, 507316, 49742]};
 
-			worker.addEventListener('getNFTMarker', function(ev) {
-				console.log("Found NFT marker", ev);
-			});
+    worker.call(id, 'loadNFTMarkerPackage', [packagefile], function(ev) {
+      if(ev.result[0] === 'final') {
+        console.log('Created NFT marker', ev);
 
-			var processingDone = true;
-			var tick = function() {
-				if (video.videoWidth && processingDone) {
-					processingDone = false;
-					ctx.drawImage(video, 0, 0, 320, 240);
-					var imageData = ctx.getImageData(0,0,320,240);
-					worker.call(id, 'process', [imageData], [imageData.data.buffer], function(ev) {
-						console.log('Processed frame');
-						processingDone = true;
-					});
-				}
-				requestAnimationFrame(tick);
-			};
-			tick();
-		});
+        worker.addEventListener('getNFTMarker', function(ev) {
+          console.log("Found NFT marker", ev);
+        });
+
+        var processingDone = true;
+        var tick = function() {
+          if (video.videoWidth && processingDone) {
+            processingDone = false;
+            ctx.drawImage(video, 0, 0, 320, 240);
+            var imageData = ctx.getImageData(0,0,320,240);
+            worker.call(id,'process',[imageData],[imageData.data.buffer],function(ev) {
+              console.log('Processed frame');
+              processingDone = true;
+            });
+          }
+          requestAnimationFrame(tick);
+        };
+        tick();
+        // マーカーロード終了
+        //document.getElementById('result').textContent = 'start!';
+      }
+    });
 	});
 }
 
