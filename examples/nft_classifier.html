@@ -74,6 +74,7 @@ navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia
 var tw = 320;
 var th = 240;
 
+// facingMode: "environment" は入れられない
 var hdConstraints = {
 	audio: false,
 	video: {
@@ -84,7 +85,16 @@ var hdConstraints = {
   	}
 };
 
-if (navigator.getUserMedia) {
+if (navigator.mediaDevices.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({
+    audio: false,
+    video: {
+      width: {max: tw},
+      height: {max: th},
+      facingMode: "environment"
+    }
+  }).then(success, errorCallback);
+} else if(navigator.getUserMedia) {
 	navigator.getUserMedia(hdConstraints, success, errorCallback);
 } else {
 	errorCallback('');
