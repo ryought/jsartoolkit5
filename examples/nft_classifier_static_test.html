@@ -112,6 +112,8 @@ function errorCallback(e) {
 
 
 function success(stream) {
+  var cw = 320;
+  var ch = 240;
 	console.log('success', stream);
   console.log('a', stream.getVideoTracks()[0]);
   console.log('a', stream.getVideoTracks()[0].getSettings());
@@ -123,11 +125,11 @@ function success(stream) {
   */
 
 	var canvas = document.createElement('canvas');
-	canvas.width = 320;
-	canvas.height = 240;
+	canvas.width = cw;
+	canvas.height = ch;
 	var ctx = canvas.getContext('2d');
 
-	worker.call(null, 'new', [320, 240, '/examples/Data/camera_para.dat']);
+	worker.call(null, 'new', [cw, ch, '/examples/Data/camera_para.dat']);
 	worker.addEventListener('load', function(ev) {
 		var id = ev.target;
 		console.log('ARController loaded', ev);
@@ -147,8 +149,8 @@ function success(stream) {
 			var tick = function() {
 				if (video2.videoWidth && processingDone) {
 					processingDone = false;
-					ctx.drawImage(video2, 0, 0, 320, 240);
-					var imageData = ctx.getImageData(0,0,320,240);
+					ctx.drawImage(video2, 0, 0, cw, ch);
+					var imageData = ctx.getImageData(0,0,cw,ch);
 					worker.call(id, 'process', [imageData], [imageData.data.buffer], function(ev) {
 						console.log('Processed frame');
 						processingDone = true;
