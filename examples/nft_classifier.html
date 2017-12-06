@@ -71,10 +71,20 @@ document.body.appendChild(video);
 
 navigator.getUserMedia  = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
-var tw = 320;
-var th = 240;
+// ios safari cannot use userMedia if width=320(overconstraint error)
+// http://lealog.hateblo.jp/entry/2017/08/21/155211
+// mac w=320  ios w=640
+const isIOS = /iP(hone|(o|a)d)/.test(navigator.userAgent)
+console.log('os check', isIOS);
+if(isIOS) {
+  var tw = 640;
+  var th = 480;
+}else {
+  var tw = 320;
+  var th = 240;
+}
 
-// facingMode: "environment" は入れられない
+// mediaDevices.getUserMediaが使えないときはfacingMode: "environment" は入れられない
 var hdConstraints = {
 	audio: false,
 	video: {
@@ -86,6 +96,7 @@ var hdConstraints = {
 };
 
 if (navigator.mediaDevices.getUserMedia) {
+  console.log('have mediaDevices.getUserMedia');
   navigator.mediaDevices.getUserMedia({
     audio: false,
     video: {
@@ -95,6 +106,7 @@ if (navigator.mediaDevices.getUserMedia) {
     }
   }).then(success, errorCallback);
 } else if(navigator.getUserMedia) {
+  console.log('only have getUserMedia');
 	navigator.getUserMedia(hdConstraints, success, errorCallback);
 } else {
 	errorCallback('');
@@ -106,18 +118,20 @@ function errorCallback(e) {
 
 
 function success(stream) {
-	console.log('success', stream);
+	//console.log('success', stream);
 	// video.src = window.URL.createObjectURL(stream); // depricated
   video.srcObject = stream;
 	video.onclick = function() { video.play(); };
 	video.play();
 
+  var cw = 320;
+  var ch = 240;
 	var canvas = document.createElement('canvas');
-	canvas.width = 320;
-	canvas.height = 240;
+	canvas.width = cw;
+	canvas.height = ch;
 	var ctx = canvas.getContext('2d');
 
-	worker.call(null, 'new', [320, 240, '/examples/Data/camera_para.dat']);
+	worker.call(null, 'new', [cw, ch, '/examples/Data/camera_para.dat']);
 	worker.addEventListener('load', function(ev) {
 		var id = ev.target;
 		console.log('ARController loaded', ev);
@@ -142,9 +156,23 @@ function success(stream) {
         var processingDone = true;
         var tick = function() {
           if (video.videoWidth && processingDone) {
+            console.log('video width', video.videoWidth, video.videoHeight, cw, ch);
+            // https://webrtc.github.io/samples/src/content/getusermedia/resolution/
             processingDone = false;
-            ctx.drawImage(video, 0, 0, 320, 240);
-            var imageData = ctx.getImageData(0,0,320,240);
+            var imageData;
+
+            if (video.videoWidth >= video.videoHeight) {
+              // 横向きの画像だったら、そのまま貼ればOK
+              console.log('original');
+              ctx.drawImage(video, 0, 0, cw, ch);
+              imageData = ctx.getImageData(0,0,cw,ch);
+            } else {
+              console.log('rotated');
+              // 縦向きの画像だったら、回転してctxに貼る
+              ctx.rotate(Math.PI/2);
+              ctx.drawImage(video, 0, 0-cw, ch, cw);
+              imageData = ctx.getImageData(0,0,cw,ch);
+            }
             worker.call(id,'process',[imageData],[imageData.data.buffer],function(ev) {
               console.log('Processed frame');
               processingDone = true;
@@ -153,11 +181,9 @@ function success(stream) {
           requestAnimationFrame(tick);
         };
         tick();
-        // マーカーロード終了
-        //document.getElementById('result').textContent = 'start!';
       }
     });
-	});
+  });
 }
 
 
