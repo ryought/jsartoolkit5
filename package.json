@@ -27,7 +27,9 @@
   "scripts": {
     "build": "node tools/makem.js; echo Built at `date`",
     "buildPattern": "python ../emscripten/tools/file_packager.py examples/patterns.data --preload examples/Pattern@/Pattern/ --js-output=build/patterns.js --lz4",
-    "watch": "./node_modules/.bin/watch 'npm run build' ./js/"
+    "buildPattern2": "cd examples/Pattern; cat 1.fset 1.fset3 1.iset 2.fset 2.fset3 2.iset > catted.datals;",
+    "watch": "./node_modules/.bin/watch 'npm run build' ./js/",
+    "deploy": "cp build/ ../firebase-hosting/public/; "
   },
   "license": "LGPL-3.0"
 }
