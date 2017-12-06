@@ -28,6 +28,7 @@ html,body {
 <p>&larr; <a href="index.html">Back to examples</a></p>
 
 <script src="../build/patterns.js"></script>
+<!-- api.jsをprejsでくっつけるのをやめた．min, patternより後にapi.jsをロードする -->
 <script src="../build/artoolkit.min.js"></script>
 <script src="../js/artoolkit.api.js"></script>
 <script async src="js/third_party/three.js/three.min.js"></script>
@@ -113,6 +114,14 @@ window.ARThreeOnLoad = function() {
 			arScene.scene.add(markerRoot2);
 		});
 		*/
+    /*
+      loadNFTMarkerPackage
+        multiple nft marker in one package file.
+        use patterns.data
+        to build
+        $ npm run build
+        then all examples/Pattern/* is included in examples/patterns.data
+    */
 
 		arController.loadNFTMarkerPackage(['/Pattern/1','/Pattern/2', '/Pattern/3'], function(markerId) {
 			console.log('marker added in id:', markerId);
