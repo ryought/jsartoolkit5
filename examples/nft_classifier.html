@@ -1,5 +1,6 @@
 <html>
 <body>
+<div id="result">initializing</div>
 
 <script>
 var worker = new Worker('../js/artoolkit.worker.js');
@@ -118,9 +119,14 @@ function success(stream) {
     worker.call(id, 'loadNFTMarkerPackage', [packagefile], function(ev) {
       if(ev.result[0] === 'final') {
         console.log('Created NFT marker', ev);
+        document.getElementById('result').textContent = 'start!';
 
         worker.addEventListener('getNFTMarker', function(ev) {
           console.log("Found NFT marker", ev);
+          document.getElementById('result').textContent = 'found ' + ev.data.marker.id;
+          setTimeout(function() {
+            document.getElementById('result').textContent = 'searching';
+          }, 1000);
         });
 
         var processingDone = true;
